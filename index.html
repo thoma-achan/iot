@@ -3,34 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Info</title>
+    <title>Get IP Address</title>
 </head>
 <body>
-    <h1>Your IP Information</h1>
-    <p id="ip-info">Fetching your IP information...</p>
-
-    <div id="footer"></div> <!-- Footer to display IP at the end -->
+    <h1>Your IP Address</h1>
+    <p id="ip-address">Fetching your IP address...</p>
+    <p id="last-ip">Last Stored IP Address: None</p>
 
     <script>
-        // Fetch IP information
-        fetch('https://ipinfo.io/json?token=YOUR_TOKEN')
+        // Fetch IP address from the API
+        fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
-                // Display IP and location information in the main section
-                document.getElementById('ip-info').textContent = `IP: ${data.ip}, Location: ${data.city}, ${data.region}, ${data.country}`;
+                const currentIP = data.ip;
 
-                // Store IP address in a variable
-                const ipAddress = data.ip;
+                // Display the current IP
+                document.getElementById('ip-address').textContent = `Your IP Address is: ${currentIP}`;
 
-                // Display IP at the end of the page
-                const footer = document.getElementById('footer');
-                footer.innerHTML = `<p style="text-align: center; margin-top: 20px;">Your IP Address: ${ipAddress}</p>`;
+                // Store the IP address in localStorage
+                localStorage.setItem('lastIP', currentIP);
+
+                // Retrieve and display the stored IP
+                const lastStoredIP = localStorage.getItem('lastIP');
+                document.getElementById('last-ip').textContent = `Last Stored IP Address: ${lastStoredIP}`;
             })
             .catch(error => {
-                // Handle errors
-                document.getElementById('ip-info').textContent = "Unable to fetch IP information.";
-                console.error('Error fetching IP info:', error);
+                document.getElementById('ip-address').textContent = "Unable to fetch IP address.";
+                console.error('Error fetching IP:', error);
             });
+
+        // Display last stored IP from localStorage on page load
+        const lastStoredIP = localStorage.getItem('lastIP');
+        if (lastStoredIP) {
+            document.getElementById('last-ip').textContent = `Last Stored IP Address: ${lastStoredIP}`;
+        }
     </script>
 </body>
 </html>
