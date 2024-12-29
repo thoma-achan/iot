@@ -3,171 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Verification</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #74b9ff, #81ecec);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 26px;
-            margin-bottom: 20px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            outline: none;
-            transition: all 0.3s ease-in-out;
-        }
-
-        input[type="text"]:focus, input[type="password"]:focus {
-            border-color: #0984e3;
-            box-shadow: 0 0 8px rgba(9, 132, 227, 0.4);
-        }
-
-        button {
-            width: 100%;
-            background-color: #0984e3;
-            color: #ffffff;
-            border: none;
-            padding: 12px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background-color: #0652dd;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 20px;
-            border-collapse: collapse;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        table th {
-            background-color: #0984e3;
-            color: white;
-        }
-
-        #message {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #e74c3c; /* Red for error messages */
-        }
-    </style>
+    <title>IP Info</title>
 </head>
 <body>
-<div class="container">
-    <h1>Password Verification</h1>
-    <form id="password-form">
-        <label for="name">Enter Name:</label>
-        <input type="text" id="name" required>
-        <label for="password">Enter Password:</label>
-        <input type="password" id="password" required>
-        <button type="submit">Verify</button>
-    </form>
-    <p id="message"></p>
-</div>
+    <h1>Your IP Information</h1>
+    <p id="ip-info">Fetching your IP information...</p>
 
-<table id="loginTable" style="display: none;">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Date</th>
-            <th>Time</th>
-        </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-</table>
+    <div id="footer"></div> <!-- Footer to display IP at the end -->
 
-<script>
-    const form = document.getElementById('password-form');
-    const message = document.getElementById('message');
-    const loginTable = document.getElementById('loginTable');
-    const tableBody = document.getElementById('tableBody');
+    <script>
+        // Fetch IP information
+        fetch('https://ipinfo.io/json?token=YOUR_TOKEN')
+            .then(response => response.json())
+            .then(data => {
+                // Display IP and location information in the main section
+                document.getElementById('ip-info').textContent = `IP: ${data.ip}, Location: ${data.city}, ${data.region}, ${data.country}`;
 
-    // Hardcoded password
-    const validPasswords = ['1234'];
+                // Store IP address in a variable
+                const ipAddress = data.ip;
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const name = document.getElementById('name').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-        if (validPasswords.includes(password)) {
-            const now = new Date();
-            const date = now.toLocaleDateString();
-            const time = now.toLocaleTimeString();
-
-            // Save the login record in localStorage
-            const loginRecord = { name, date, time };
-            let loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
-            loginHistory.push(loginRecord);
-            localStorage.setItem('loginHistory', JSON.stringify(loginHistory));
-
-            // Append to table
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${name}</td><td>${date}</td><td>${time}</td>`;
-            tableBody.appendChild(row);
-
-            loginTable.style.display = 'table';
-
-            // Create a log file for download (invisible to the user)
-            const logData = loginHistory.map(record => `Name: ${record.name}, Date: ${record.date}, Time: ${record.time}`).join('\n');
-            const blob = new Blob([logData], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'user_log.txt';
-            link.click();
-
-            // Clear form and reset message
-            form.reset();
-            message.textContent = 'Login successful!';
-            message.style.color = 'green';
-        } else {
-            message.textContent = 'Invalid password.';
-            message.style.color = 'red';
-        }
-    });
-</script>
+                // Display IP at the end of the page
+                const footer = document.getElementById('footer');
+                footer.innerHTML = `<p style="text-align: center; margin-top: 20px;">Your IP Address: ${ipAddress}</p>`;
+            })
+            .catch(error => {
+                // Handle errors
+                document.getElementById('ip-info').textContent = "Unable to fetch IP information.";
+                console.error('Error fetching IP info:', error);
+            });
+    </script>
 </body>
 </html>
