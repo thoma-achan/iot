@@ -8,8 +8,7 @@
 <body>
     <h1>Your IP Address</h1>
     <p id="ip-address">Fetching your IP address...</p>
-    <p id="last-ip">Last Stored IP Address: None</p>
-
+  
     <script>
         // Fetch IP address from the API
         fetch('https://api.ipify.org?format=json')
@@ -20,13 +19,7 @@
                 // Display the current IP
                 document.getElementById('ip-address').textContent = `Your IP Address is: ${currentIP}`;
 
-                // Store the IP address in localStorage
-                localStorage.setItem('lastIP', currentIP);
-
-                // Retrieve and display the stored IP
-                const lastStoredIP = localStorage.getItem('lastIP');
-                document.getElementById('last-ip').textContent = `Last Stored IP Address: ${lastStoredIP}`;
-            })
+               })
             .catch(error => {
                 document.getElementById('ip-address').textContent = "Unable to fetch IP address.";
                 console.error('Error fetching IP:', error);
